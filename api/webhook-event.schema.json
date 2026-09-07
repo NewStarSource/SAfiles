@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://starmap.example/schemas/webhook-event-v1.json",
+  "title": "Starmap public webhook event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "event_id", "event_type", "resource_type", "object_id", "occurred_at", "api_url"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1"},
+    "event_id": {"type": "string", "format": "uuid"},
+    "event_type": {"type": "string", "enum": ["created", "updated", "deleted", "restricted"]},
+    "resource_type": {"type": "string"},
+    "object_id": {"type": "string", "format": "uuid"},
+    "revision_id": {"type": ["string", "null"]},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "api_url": {"type": "string", "format": "uri", "pattern": "^https://"}
+  }
+}

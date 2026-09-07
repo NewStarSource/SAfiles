@@ -1,0 +1,25 @@
+{
+  "openapi": "3.1.0",
+  "info": {"title": "Starmap Public API", "version": "1.0.0", "description": "Read-only public API. Exact policy is TECH-12."},
+  "servers": [{"url": "https://starmap.example/api/v1"}],
+  "security": [{"ApiKeyAuth": []}],
+  "paths": {
+    "/communities": {"get": {"summary": "List public communities", "operationId": "listCommunities", "responses": {"200": {"$ref": "#/components/responses/List"}, "401": {"$ref": "#/components/responses/Unauthenticated"}, "429": {"$ref": "#/components/responses/RateLimited"}}}},
+    "/themes": {"get": {"summary": "List public themes", "operationId": "listThemes", "responses": {"200": {"$ref": "#/components/responses/List"}}}},
+    "/activities": {"get": {"summary": "List public activities", "operationId": "listActivities", "responses": {"200": {"$ref": "#/components/responses/List"}}}},
+    "/posts/{id}": {"get": {"summary": "Read one public post", "operationId": "getPost", "parameters": [{"$ref": "#/components/parameters/Id"}], "responses": {"200": {"$ref": "#/components/responses/Resource"}, "404": {"$ref": "#/components/responses/NotFound"}, "410": {"$ref": "#/components/responses/Gone"}}}},
+    "/wiki/pages/{id}": {"get": {"summary": "Read one public Wiki page", "operationId": "getWikiPage", "parameters": [{"$ref": "#/components/parameters/Id"}], "responses": {"200": {"$ref": "#/components/responses/Resource"}, "404": {"$ref": "#/components/responses/NotFound"}, "410": {"$ref": "#/components/responses/Gone"}}}},
+    "/changes": {"get": {"summary": "Read public change events", "operationId": "listChanges", "parameters": [{"$ref": "#/components/parameters/Cursor"}, {"$ref": "#/components/parameters/UpdatedSince"}], "responses": {"200": {"$ref": "#/components/responses/List"}, "410": {"$ref": "#/components/responses/SyncReset"}}}}
+  },
+  "components": {
+    "securitySchemes": {"ApiKeyAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "API key"}},
+    "parameters": {"Id": {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}, "Cursor": {"name": "cursor", "in": "query", "schema": {"type": "string"}}, "UpdatedSince": {"name": "updated_since", "in": "query", "schema": {"type": "string", "format": "date-time"}}},
+    "schemas": {
+      "Meta": {"type": "object", "required": ["request_id"], "properties": {"request_id": {"type": "string"}, "next_cursor": {"type": ["string", "null"]}, "schema_version": {"type": "string", "const": "1"}}},
+      "Resource": {"type": "object", "required": ["id", "resource_type", "visibility", "license", "updated_at"], "properties": {"id": {"type": "string", "format": "uuid"}, "resource_type": {"type": "string"}, "revision_id": {"type": ["string", "null"]}, "visibility": {"type": "string", "enum": ["public"]}, "license": {"type": "string"}, "published_at": {"type": ["string", "null"], "format": "date-time"}, "updated_at": {"type": "string", "format": "date-time"}, "status": {"type": "string"}}},
+      "ListResponse": {"type": "object", "required": ["data", "meta"], "properties": {"data": {"type": "array", "items": {"$ref": "#/components/schemas/Resource"}}, "meta": {"$ref": "#/components/schemas/Meta"}}},
+      "ErrorResponse": {"type": "object", "required": ["errors", "meta"], "properties": {"errors": {"type": "array", "items": {"type": "object", "required": ["code", "message"], "properties": {"code": {"type": "string"}, "message": {"type": "string"}, "detail": {"type": "string"}}}}, "meta": {"$ref": "#/components/schemas/Meta"}}}
+    },
+    "responses": {"List": {"description": "List", "headers": {"ETag": {"schema": {"type": "string"}}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ListResponse"}}}}, "Resource": {"description": "Public resource", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Resource"}}}}, "Unauthenticated": {"description": "Unauthenticated", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}, "RateLimited": {"description": "Rate limited", "headers": {"Retry-After": {"schema": {"type": "integer"}}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}, "NotFound": {"description": "Not found", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}, "Gone": {"description": "Gone", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}, "SyncReset": {"description": "Change cursor is older than retention", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}}
+  }
+}

@@ -1,12 +1,20 @@
 ---
 title: SA5-星图 Wiki 条目模板
-version: 2.0-draft
+version: 2.1
 created: 2026-08-24
-status: draft
+status: confirmed
+updated: 2026-09-05
+owner: 新星团队
+reviewers: 用户（本会话审议确认）
+last_reviewed: 2026-09-05
+effective_date: 2026-09-05
+supersedes: 2.0-draft
+previous_status: draft
+change_log: 文档修订说明-2026-09-05.md
 license: CC BY-SA 4.0
 ---
 
-# 星图 Wiki 条目模板 v2
+# 星图 Wiki 条目模板 v2.1
 
 本文档提供六类首批正式条目的基础模板。基础字段由新星团队维护；相关社群可以在不改变基础字段、不突破隐私和安全底线的前提下增加扩展字段。
 
@@ -81,7 +89,7 @@ source: https://example.com/source
 ## 来源
 ```
 
-未公开作品可以使用相同模板，但必须设置登录用户或相关社群成员可见，并遵守作者的隐藏、删除或匿名化请求。
+未公开作品须经作者主动授权建立，默认仅作者及指定审核人员可见；扩展到指定社群成员或全体登录用户须另行确认，并遵守作者的隐藏、删除或匿名化请求。
 
 ## 3. 梗条目
 
@@ -235,6 +243,6 @@ names:
 ```markdown
 该事实经私下核验。[^private-1]
 
-[^private-1]: 私下核验，来源受限。原始材料仅由新星团队及相关社群代表查看。
+[^private-1]: 私下核验，来源受限。原始材料仅限团队指定核验人员查看，核验完成后 7 天删除；代表查看必要脱敏结论。
 ```
 
