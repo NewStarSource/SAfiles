@@ -3,14 +3,13 @@ title: SA0-星图共同体宪章
 version: 2.2
 created: 2026-08-07
 status: confirmed
-updated: 2026-09-05
+updated: 2026-09-26
 owner: 新星团队
 reviewers: 用户（本会话审议确认）
 last_reviewed: 2026-09-05
 effective_date: 2026-09-05
 supersedes: 2.1
 previous_status: confirmed
-change_log: 文档修订说明-2026-09-05.md
 ---
 
 # 星图共同体宪章 v2.2
@@ -96,7 +95,7 @@ change_log: 文档修订说明-2026-09-05.md
 
 ## 8. 关联文档
 
-- 《SA1-社群、内容与活动规则 v2.2》规定社群页、发布、讨论、活动、来源与许可证。
+- 《SA1-社群、内容与活动规则 v2.3》规定社群分类、社群页、发布、讨论、活动、来源与许可证。
 - 《SA2-自治与公共治理规则 v2.2》规定成员、代表、团队、投票、举报、申诉和财务。
 - 《SA3-隐私、数据与公共 API 政策 v2.2》规定账户、数据、搜索、申请和 API。
 - 《SA4-开源与技术运行规则 v2.2》规定 GPLv3、技术贡献、运行透明、维护与迁移。

@@ -10,7 +10,6 @@ last_reviewed: 2026-09-05
 effective_date: 2026-09-05
 supersedes: 2.1
 previous_status: confirmed
-change_log: 文档修订说明-2026-09-05.md
 license: CC BY-SA 4.0
 ---
 

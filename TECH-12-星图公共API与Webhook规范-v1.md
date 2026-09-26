@@ -10,7 +10,6 @@ last_reviewed: 2026-09-05
 effective_date: 2026-09-05
 supersedes: 1.0-draft
 previous_status: confirmed
-change_log: 文档修订说明-2026-09-05.md
 ---
 
 # 星图公共 API 与 Webhook 规范 v1.1

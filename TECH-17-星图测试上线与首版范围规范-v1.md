@@ -10,7 +10,6 @@ last_reviewed: 2026-09-05
 effective_date: 2026-09-05
 supersedes: 1.1
 previous_status: confirmed
-change_log: 文档修订说明-2026-09-05.md
 ---
 
 # 星图测试上线与首版范围规范 v1.2

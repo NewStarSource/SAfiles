@@ -10,7 +10,6 @@ last_reviewed: 2026-09-05
 effective_date: 2026-09-05
 supersedes: 1.0-draft
 previous_status: draft
-change_log: 文档修订说明-2026-09-05.md
 ---
 
 # 星图系统架构设计 v1.1
