@@ -1,18 +1,16 @@
 ---
 title: TECH-12-星图公共 API 与 Webhook 规范
-version: 1.1
+version: 1.2
 created: 2026-09-02
-status: confirmed
-updated: 2026-09-05
+status: review
+updated: 2026-09-26
 owner: 新星团队
-reviewers: 用户（本会话审议确认）
 last_reviewed: 2026-09-05
-effective_date: 2026-09-05
-supersedes: 1.0-draft
+supersedes: 1.1
 previous_status: confirmed
 ---
 
-# 星图公共 API 与 Webhook 规范 v1.1
+# 星图公共 API 与 Webhook 规范 v1.2
 
 
 ## 1. 范围与契约
@@ -20,6 +18,8 @@ previous_status: confirmed
 本文件为 API/Webhook 唯一规则来源。机器契约为 [OpenAPI 3.1](api/openapi.json) 和 [Webhook JSON Schema](api/webhook-event.schema.json)。公开资源包括社群、主题、关系、活动、帖子和公开 Wiki 页面/版本/脚注；不包含用户主页、隐藏关系、申请、举报、原始证明、个人选票、账户 ID 或行为日志。
 
 核心首发不开 API；第二批只读 API 和后续 Webhook 按 TECH-17 开关。不存在的功能不要提前向用户签发 scope。个人数据导出由本人会话授权，公共 API 不设 `export_manage`。
+
+分类路径、社群公告/指引、讨论合集、作品展柜、意见收集及治理议题在站内可见，并不自动成为公共 API 资源。只有同步更新 OpenAPI/事件 Schema、许可与可见性验收并开启功能开关后才可暴露新字段、端点或事件；个人意见选项、联署和选票不得进入公共 API 或 Webhook。现有社群/帖子端点不能借合集或展柜引用绕过原对象授权。
 
 ## 2. 认证、密钥和限流
 

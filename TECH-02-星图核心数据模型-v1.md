@@ -1,18 +1,16 @@
 ---
 title: TECH-02-星图核心数据模型
-version: 1.2
+version: 1.3
 created: 2026-08-30
-status: confirmed
-updated: 2026-09-05
+status: review
+updated: 2026-09-26
 owner: 新星团队
-reviewers: 用户（本会话审议确认）
 last_reviewed: 2026-09-05
-effective_date: 2026-09-05
-supersedes: 1.1
+supersedes: 1.2
 previous_status: confirmed
 ---
 
-# 星图核心数据模型 v1.2
+# 星图核心数据模型 v1.3
 
 ## 1. 设计原则
 
@@ -28,18 +26,23 @@ previous_status: confirmed
 | `users` | 新星账户映射、内部关联用户标识和账户状态 |
 | `identities` | 当前化名、历史化名和注销状态 |
 | `communities` | 社群页面、状态、代表和公开规则 |
+| `category_nodes` / `community_category_links` | 领域、方向、细分的树与社群主分类/相关入口；不授予治理权 |
 | `community_members` | 关注者、正式成员、加入时间和确认来源 |
 | `community_representatives` | 现任/临时代表及授权状态 |
 | `themes` | 正式兴趣主题和自由标签 |
 | `posts` | 普通动态、创作、观察、招募和个人分享 |
 | `replies` | 普通内容和 Wiki 页的多层回复树 |
 | `activities` | 线上活动、报名和结束记录 |
+| `community_announcements` / `community_guides` | 社群公告与新人指引的受权维护版本 |
+| `discussion_collections` / `collection_items` | 社群讨论合集及指向原动态或回复的引用 |
+| `showcase_items` | 作者主动提交的作品引用、展示分组和撤回状态 |
+| `opinion_surveys` / `survey_responses` | 无约束力的意见收集及受限个人选择 |
 | `wiki_pages` | 发现页、条目、消歧页、重定向页 |
 | `wiki_revisions` | Wiki 每次正文版本、差异和审核信息 |
 | `wiki_suggestions` | 绑定字段/段落的修改建议 |
 | `wiki_relations` | 条目间单向或双向关系 |
 | `sources` | 公开来源、私下核验状态和脚注映射 |
-| `votes` | 提案、资格快照、受限最终选票和公开汇总结果 |
+| `votes` | 正式表决的资格快照、受限最终选票和公开汇总结果；不混入意见收集 |
 | `reports` | 举报、证据、处理状态和申诉 |
 | `notifications` | 站内通知和发送状态 |
 | `api_keys` / `webhooks` | 公共 API 与事件订阅凭证 |
@@ -96,8 +99,8 @@ previous_status: confirmed
 | `content_restrictions` | 对象、范围/社群 ID、风险、原因、案件、发起者、`expires_at`、解除事件；独立限制取交集 |
 | `moderation_cases` / `case_access_grants` | 风险、优先级、原决定、处理人、复核人、`received_at`、`due_at`、利益冲突、范围、授权到期、升级次数 |
 | `community_members` | `status` 为 pending/active/left/revoked/expired；确认来源、确认者、`verified_at`、可空到期时间、撤销决定；团队才可强制移除 |
-| `polls` / `poll_eligibility` | 锁定提案版本、范围、起止时间、规则版本、候选及席位、法定人数、结算水位；每投票/主体快照唯一 |
-| `ballots` / `ballot_events` | 每投票/主体一份受限当前选项；改票事件不带旧选项；最终选票固化，结算仅一次，个人映射单独保存 |
+| `polls` / `poll_eligibility` | 锁定议题及方案版本、范围、起止时间、计票方式、规则版本、法定人数、结算水位和可空补投来源；每投票/主体快照唯一 |
+| `ballots` / `ballot_events` | 每投票/主体一份受限当前选项或多方案赞成集合；弃权/空白独立表示，改票事件不带旧选项；最终选票固化，结算仅一次，个人映射单独保存 |
 | `attachments` | 所有者、对象版本、随机存储键、SHA-256、MIME、字节/像素/帧数、扫描器版本、扫描状态、派生图、隔离/到期时间 |
 | `drafts` / `coauthor_proposals` | 用户、对象版本、到期；共同作者接受列表、操作类型、基准版本、通知就绪时间、截止、确认/异议 |
 | `notifications` | 接收者、源对象 ID、类别、业务去重键、未读状态、保留截止；生成时和读取时校验可见性，不永久复制标题 |
@@ -110,9 +113,11 @@ previous_status: confirmed
 
 | 实体 | 必需数据与约束 |
 |---|---|
-| `governance_proposals` / `proposal_revisions` | 影响范围、提案正文、实质版本、规则版本、讨论/联署截止、审查状态、退回理由、普通/法定议程类型；表决正文不可变 |
+| `governance_issues` / `issue_revisions` | 稳定议题 ID、讨论型/决策型、影响范围、正文、实质版本、规则版本、讨论/联署截止、审查状态、退回理由；升级保留旧讨论历史但生成新版本 |
+| `issue_solutions` / `solution_revisions` | 议题及方案版本、摘要、成本、实施人、验收标准、提交者、纠正窗口、合并依据；表决开始后锁定选项 |
 | `endorsement_eligibility` / `endorsements` | 提案版本、快照主体、冻结 N/门槛、支持/撤回时间；每版本/关联主体唯一，快照区别于投票资格表，个人记录不公开 |
 | `agenda_entries` | 审查完成时间、稳定排序 ID、排期、占位、积压说明；普通议题并发名额事务内检查，例外须记录 SA2 原因 |
+| `issue_broadcasts` | 仅决策型议题发起/表决两个节点各一条唯一事件；收件人按通知偏好筛选，不公开名单 |
 | `decision_deliveries` / `delivery_updates` | 原决定 ID、实施人接受记录、资源/预算、规则生效日、原交付日、验收人/标准、进展、复议 ID；新期限须绑定新有效决定 |
 | `review_pool_terms` / `review_assignments` | 选举结果、任期、无团队兼任检查、案件候补池快照、排除理由、抽取事件、替补关系、回避状态；复核组内主体唯一 |
 | `case_access_grants` / `review_decisions` | 两名审批人的关联主体引用、当前任职/在案资格、字段范围、用途、接收人、到期/撤销、决定票及落实期限；不能只检查签名数量 |
@@ -121,4 +126,12 @@ previous_status: confirmed
 | `community_consents` | 方案版本、受影响社群、独立投票结果和规则版本；同意绑定同一方案，不以一个总票数替代各社群结果 |
 | `governance_trials` | 实际启用日期、观察截止、参数版本、45 天评估、60 天复盘、调整决定；文档确认日不填作实际启用日 |
 
-一般 Wiki 修改建议复用原 `wiki_suggestions`，不混入全站联署。当前提案状态、有效联署计数及公开投票启动必须保持事务一致；计数变化事件无个人信息。终止提案、复核替补、委托撤销及到期任务均保留世代，旧 worker 不得覆盖新授权。
+一般 Wiki 修改建议复用原 `wiki_suggestions`，不混入全站联署。讨论型议题不产生联署、议程占位或正式表决；升级为决策型时冻结新版本，旧支持不迁移。当前议题状态、有效联署计数及公开投票启动必须保持事务一致；计数变化事件无个人信息。多方案按一人一份有效选票计算分母，补投绑定原资格快照并单独结算。终止议题、复核替补、委托撤销及到期任务均保留世代，旧 worker 不得覆盖新授权。
+
+## 14. 社群分类与工具约束
+
+`category_nodes` 保存稳定 ID、父节点、领域/方向/细分层级、名称、路径别名和状态；移动或改名校验无环并保留旧路径重定向。`community_category_links` 同一社群最多一条有效主路径、两条相关入口，关联同一分类节点不重复；分类和正式主题使用不同关系表，待分类不阻止社群创建、确认和搜索。浏览统计按社群 ID 去重，读取时重新校验社群当前可见性。
+
+公告、指引及合集保存社群 ID、维护者、版本、展示顺序和受限编辑授权；合集条目仅保存原动态或回复的类型、ID 与排序，不复制正文。活动日历由 `activities` 的当前版本和报名记录生成，不建第二份参与名单。展柜条目保存原作品 ID、作者主动提交及撤回时间、整理者和精选依据，原作品删除、隐藏或移除社群关联时立即停止展示。
+
+意见收集保存题型、参与对象、截止时间、选项版本和公开汇总；单选/多选的个人选择与关联主体映射单独受限保存，每征集/主体只保留一份当前答复。截止前修改或撤回原子更新汇总，开放文字意见沿普通内容可见性与删除规则处理。意见收集不能引用正式投票资格快照，也不能生成治理决定或实施台账。
