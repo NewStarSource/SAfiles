@@ -2,10 +2,12 @@
 title: TECH-12-星图公共 API 与 Webhook 规范
 version: 1.2
 created: 2026-09-02
-status: review
+status: confirmed
 updated: 2026-09-26
 owner: 新星团队
-last_reviewed: 2026-09-05
+reviewers: 用户（本会话审议确认）
+last_reviewed: 2026-09-26
+effective_date: 2026-09-26
 supersedes: 1.1
 previous_status: confirmed
 ---

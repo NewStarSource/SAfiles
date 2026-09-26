@@ -2,10 +2,12 @@
 title: SA2-自治与公共治理规则
 version: 2.2
 created: 2026-08-07
-status: review
+status: confirmed
 updated: 2026-09-25
 owner: 新星团队
-last_reviewed: 2026-09-05
+reviewers: 用户（本会话审议确认）
+last_reviewed: 2026-09-26
+effective_date: 2026-09-26
 supersedes: 2.1
 previous_status: confirmed
 ---

@@ -2,10 +2,12 @@
 title: TECH-02-星图核心数据模型
 version: 1.3
 created: 2026-08-30
-status: review
+status: confirmed
 updated: 2026-09-26
 owner: 新星团队
-last_reviewed: 2026-09-05
+reviewers: 用户（本会话审议确认）
+last_reviewed: 2026-09-26
+effective_date: 2026-09-26
 supersedes: 1.2
 previous_status: confirmed
 ---
