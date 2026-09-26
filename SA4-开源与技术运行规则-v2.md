@@ -6,8 +6,8 @@ status: confirmed
 updated: 2026-09-26
 owner: 新星团队
 reviewers: 用户（本会话审议确认）
-last_reviewed: 2026-09-05
-effective_date: 2026-09-05
+last_reviewed: 2026-09-26
+effective_date: 2026-09-26
 supersedes: 2.1
 previous_status: confirmed
 ---
@@ -18,7 +18,7 @@ previous_status: confirmed
 
 星图代码采用 GNU General Public License v3.0（GPLv3）。任何人可以在 GPLv3 条件下使用、修改和分发代码；衍生版本必须继续履行相应的开放义务。
 
-代码公开不等于任何人都拥有生产系统的直接写入权。外部贡献者可以提交代码和技术建议，由新星团队审查安全、兼容性和维护成本后合并。
+代码公开不等于任何人都拥有生产系统的直接写入权。外部贡献者可以提交代码和技术建议；代码由 AI 审查安全、兼容性和维护成本，并通过适用测试后合并。当前由一名项目负责人管理开发和发布，不要求多人开发或人工代码审查；具体流程见 TECH-07，生产发布由项目负责人确认。
 
 普通修复与维护不必全站投票；会改变重大权限、公共规则或产品方向的技术变更，必须依《SA2-自治与公共治理规则 v2.2》交全站投票。
 

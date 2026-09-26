@@ -3,11 +3,11 @@ title: TECH-08-星图环境、发布与运行基线
 version: 1.1
 created: 2026-08-31
 status: confirmed
-updated: 2026-09-05
+updated: 2026-09-26
 owner: 新星团队
 reviewers: 用户（本会话审议确认）
-last_reviewed: 2026-09-05
-effective_date: 2026-09-05
+last_reviewed: 2026-09-26
+effective_date: 2026-09-26
 supersedes: 1.0-draft
 previous_status: confirmed
 ---
@@ -19,7 +19,7 @@ previous_status: confirmed
 | 项目 | 决定 |
 |---|---|
 | 环境 | 开发、测试、正式环境分离；测试可与正式共用 VPS，但数据、域名和密钥必须隔离 |
-| 代码管理 | GitHub 或 GitLab；提交自动测试，正式发布由人类手动确认 |
+| 代码管理 | GitHub 或 GitLab；代码通过 AI 审核和适用自动测试，正式发布由项目负责人确认，不要求多人签字 |
 | 运行告警 | 管理员页面和邮箱通知；严重故障增加即时通讯或手机告警 |
 | 图片 | 单张不超过 10 MB；每条内容最多 20 张；支持 JPEG、PNG、GIF、WebP；自动生成缩略图 |
 | 搜索 | 支持不加空格搜索、简繁体、别名、旧称、拼写变体和页面类型筛选 |
