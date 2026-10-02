@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>组件库 - AtlasSite</title>
+  <style>
+    :root {
+      --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.8125rem);
+      --text-sm: clamp(0.875rem, 0.825rem + 0.25vw, 0.9375rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
+      --text-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
+      --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+      --space-6: 1.5rem; --space-8: 2rem; --space-12: 3rem; --space-16: 4rem;
+      --content-width: 720px; --sidebar-width: 240px;
+      --radius-sm: 4px; --radius-md: 8px; --radius-full: 999px;
+
+      --bg-primary: #FFFFFF; --bg-secondary: #F5F5F5; --bg-tertiary: #EBEBEB; --bg-hover: #F9F9F9;
+      --text-primary: #000000; --text-secondary: #525252; --text-tertiary: #737373; --text-inverse: #FFFFFF;
+      --border-subtle: #E5E5E5; --border-default: #D4D4D4; --border-strong: #A3A3A3;
+      --accent-primary: #0066FF;
+      --state-success: #10B981; --state-warning: #EA580C; --state-error: #DC2626;
+
+      --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.04);
+      --shadow-sm: 0 2px 4px 0 rgba(0,0,0,0.06), 0 1px 2px 0 rgba(0,0,0,0.03);
+      --shadow-md: 0 4px 8px 0 rgba(0,0,0,0.08), 0 2px 4px 0 rgba(0,0,0,0.04);
+      --shadow-lg: 0 8px 16px 0 rgba(0,0,0,0.1), 0 4px 8px 0 rgba(0,0,0,0.06);
+
+      --focus-ring: 0 0 0 3px rgba(0,102,255,0.2);
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #0A0A0A; --bg-secondary: #141414; --bg-tertiary: #1F1F1F; --bg-hover: #262626;
+        --text-primary: #FAFAFA; --text-secondary: #A3A3A3; --text-tertiary: #737373; --text-inverse: #0A0A0A;
+        --border-subtle: #262626; --border-default: #404040; --border-strong: #525252;
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-base); font-size: var(--text-base); line-height: 1.75; color: var(--text-primary); background: var(--bg-primary); }
+    h1, h2, h3 { font-weight: 600; line-height: 1.3; letter-spacing: -0.02em; }
+    h1 { font-size: var(--text-xl); }
+    h2 { font-size: var(--text-lg); }
+
+    .layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; }
+    @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } }
+
+    .sidebar { position: sticky; top: 0; height: 100vh; padding: var(--space-6) var(--space-4); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: var(--space-8); background: var(--bg-primary); }
+    @media (max-width: 768px) { .sidebar { position: fixed; bottom: 0; left: 0; right: 0; top: auto; height: auto; flex-direction: row; justify-content: space-around; padding: var(--space-3); border-right: none; border-top: 1px solid var(--border-subtle); z-index: 100; } }
+
+    .logo { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-lg); font-weight: 700; }
+    .logo svg { width: 32px; height: 32px; }
+    @media (max-width: 768px) { .logo span { display: none; } }
+
+    .nav { display: flex; flex-direction: column; gap: var(--space-1); }
+    @media (max-width: 768px) { .nav { flex-direction: row; gap: 0; } }
+
+    .nav-item { padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); color: var(--text-secondary); font-size: var(--text-sm); transition: all var(--transition-fast); display: flex; align-items: center; gap: var(--space-2); text-decoration: none; }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); transform: translateX(2px); }
+    @media (max-width: 768px) { .nav-item { flex-direction: column; gap: var(--space-1); padding: var(--space-2); font-size: var(--text-xs); } }
+
+    .main { max-width: var(--content-width); margin: 0 auto; padding: var(--space-6) var(--space-4) calc(var(--space-12) + 60px); }
+    @media (min-width: 769px) { .main { padding-bottom: var(--space-12); } }
+
+    /* Component Sections */
+    .component-section {
+      margin-bottom: var(--space-12);
+      padding-bottom: var(--space-8);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .component-section:last-child {
+      border-bottom: none;
+    }
+
+    .component-title {
+      margin-bottom: var(--space-4);
+    }
+
+    .component-description {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-6);
+      line-height: 1.6;
+    }
+
+    .component-demo {
+      padding: var(--space-6);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-4);
+    }
+
+    /* Dropdown Menu */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-trigger {
+      padding: var(--space-2) var(--space-4);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: var(--text-sm);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .dropdown-trigger:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-strong);
+    }
+
+    .dropdown-trigger:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: var(--focus-ring);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + var(--space-2));
+      right: 0;
+      min-width: 200px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: all var(--transition-base);
+      z-index: 1000;
+    }
+
+    .dropdown.open .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      background: none;
+      border: none;
+      text-align: left;
+      font-family: inherit;
+      font-size: var(--text-sm);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .dropdown-item:first-child {
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+
+    .dropdown-item:last-child {
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+    }
+
+    .dropdown-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: var(--space-1) 0;
+    }
+
+    .dropdown-item.danger {
+      color: var(--state-error);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-base);
+      z-index: 2000;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      max-width: 480px;
+      width: calc(100% - var(--space-8));
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.95);
+      transition: transform var(--transition-base);
+    }
+
+    .modal-overlay.open .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-title {
+      font-size: var(--text-lg);
+      font-weight: 600;
+    }
+
+    .modal-body {
+      padding: var(--space-6);
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    .modal-footer {
+      padding: var(--space-6);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      top: var(--space-6);
+      right: var(--space-6);
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      pointer-events: none;
+    }
+
+    .toast {
+      min-width: 300px;
+      padding: var(--space-4);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      pointer-events: auto;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all var(--transition-base);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .toast-content {
+      flex: 1;
+      font-size: var(--text-sm);
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      padding: var(--space-1);
+      line-height: 1;
+      transition: color var(--transition-fast);
+    }
+
+    .toast-close:hover {
+      color: var(--text-primary);
+    }
+
+    .toast.success {
+      border-color: var(--state-success);
+    }
+
+    .toast.success .toast-icon {
+      color: var(--state-success);
+    }
+
+    .toast.error {
+      border-color: var(--state-error);
+    }
+
+    .toast.error .toast-icon {
+      color: var(--state-error);
+    }
+
+    .toast.warning {
+      border-color: var(--state-warning);
+    }
+
+    .toast.warning .toast-icon {
+      color: var(--state-warning);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: var(--space-2) var(--space-4);
+      background: var(--text-primary);
+      color: var(--text-inverse);
+      border: none;
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-default);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--border-strong);
+    }
+
+    .btn-danger {
+      background: var(--state-error);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #B91C1C;
+    }
+
+    /* Empty State */
+    .empty-state {
+      padding: var(--space-12) var(--space-4);
+      text-align: center;
+      color: var(--text-tertiary);
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: var(--space-4);
+      opacity: 0.4;
+    }
+
+    .empty-state-title {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .empty-state-text {
+      font-size: var(--text-base);
+      max-width: 480px;
+      margin: 0 auto var(--space-6);
+      line-height: 1.6;
+    }
+
+    /* Loading Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      border-radius: var(--radius-sm);
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton-text {
+      height: 1em;
+      margin-bottom: var(--space-2);
+    }
+
+    .skeleton-title {
+      height: 1.5em;
+      width: 60%;
+      margin-bottom: var(--space-3);
+    }
+
+    .skeleton-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+    }
+
+    .skeleton-card {
+      padding: var(--space-6);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border-subtle);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: var(--space-8);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="/" class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+            <path d="M36 8 C35.5 13 36 18 35.5 22 C35 25 33.5 27 30.5 28.5 C25 31 18 33 11 35"/>
+            <path d="M12.5 39 C17 38.5 20.5 40 26 43"/>
+            <path d="M29 42.5 C31 48 34 52 34.5 58"/>
+            <circle cx="36" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="11" cy="35" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="26" cy="43" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="29" cy="42.5" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="34.5" cy="58" r="1.5" fill="currentColor" stroke="none"/>
+          </g>
+        </svg>
+        <span>AtlasSite</span>
+      </a>
+      <nav class="nav">
+        <a href="/" class="nav-item"><span aria-hidden="true">⌘</span><span>首页</span></a>
+        <a href="/discover" class="nav-item"><span aria-hidden="true">◉</span><span>发现</span></a>
+        <a href="/notifications" class="nav-item"><span aria-hidden="true">●</span><span>通知</span></a>
+        <a href="/settings" class="nav-item"><span aria-hidden="true">⚙</span><span>设置</span></a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <h1 style="margin-bottom: var(--space-2);">组件库</h1>
+      <p style="color: var(--text-secondary); margin-bottom: var(--space-8);">
+        AtlasSite设计系统的可复用组件演示
+      </p>
+
+      <!-- Dropdown Menu -->
+      <section class="component-section">
+        <h2 class="component-title">下拉菜单 Dropdown</h2>
+        <p class="component-description">
+          用于显示更多操作选项,支持分组和危险操作标识
+        </p>
+        <div class="component-demo">
+          <div class="dropdown" id="demo-dropdown">
+            <button class="dropdown-trigger">
+              更多操作
+              <span aria-hidden="true">▾</span>
+            </button>
+            <div class="dropdown-menu">
+              <button class="dropdown-item">编辑</button>
+              <button class="dropdown-item">分享</button>
+              <button class="dropdown-item">收藏</button>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item">举报</button>
+              <button class="dropdown-item danger">删除</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Modal -->
+      <section class="component-section">
+        <h2 class="component-title">模态对话框 Modal</h2>
+        <p class="component-description">
+          用于确认操作、展示详细信息或收集用户输入
+        </p>
+        <div class="component-demo">
+          <button class="btn" onclick="openModal()">打开对话框</button>
+        </div>
+      </section>
+
+      <!-- Toast -->
+      <section class="component-section">
+        <h2 class="component-title">提示通知 Toast</h2>
+        <p class="component-description">
+          用于显示操作结果的轻量级通知,自动消失
+        </p>
+        <div class="component-demo">
+          <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+            <button class="btn" onclick="showToast('success', '操作成功')">成功提示</button>
+            <button class="btn-secondary btn" onclick="showToast('error', '操作失败,请重试')">错误提示</button>
+            <button class="btn-secondary btn" onclick="showToast('warning', '请注意检查输入')">警告提示</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Empty State -->
+      <section class="component-section">
+        <h2 class="component-title">空状态 Empty State</h2>
+        <p class="component-description">
+          当列表或区域没有内容时显示
+        </p>
+        <div class="component-demo">
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h3 class="empty-state-title">暂无内容</h3>
+            <p class="empty-state-text">
+              这里还没有任何内容,发布第一条内容开始吧
+            </p>
+            <button class="btn">发布内容</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Loading Skeleton -->
+      <section class="component-section">
+        <h2 class="component-title">骨架屏 Skeleton</h2>
+        <p class="component-description">
+          内容加载时的占位符,提供更好的感知性能
+        </p>
+        <div class="component-demo">
+          <div class="skeleton-card">
+            <div style="display: flex; gap: var(--space-4); margin-bottom: var(--space-4);">
+              <div class="skeleton skeleton-avatar"></div>
+              <div style="flex: 1;">
+                <div class="skeleton skeleton-text" style="width: 30%;"></div>
+                <div class="skeleton skeleton-text" style="width: 50%;"></div>
+              </div>
+            </div>
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text" style="width: 80%;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Spinner -->
+      <section class="component-section">
+        <h2 class="component-title">加载指示器 Spinner</h2>
+        <p class="component-description">
+          用于显示加载状态的旋转动画
+        </p>
+        <div class="component-demo">
+          <div class="spinner-container">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Markup -->
+  <div class="modal-overlay" id="demo-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">确认删除</h3>
+      </div>
+      <div class="modal-body">
+        确定要删除这条内容吗？删除后无法恢复。
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary btn" onclick="closeModal()">取消</button>
+        <button class="btn-danger btn" onclick="closeModal()">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+    // Dropdown
+    document.getElementById('demo-dropdown').addEventListener('click', function(e) {
+      e.stopPropagation();
+      this.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function() {
+      document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
+    });
+
+    // Modal
+    function openModal() {
+      document.getElementById('demo-modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('demo-modal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('demo-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // Toast
+    function showToast(type, message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+
+      const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠'
+      };
+
+      toast.innerHTML = `
+        <div class="toast-icon">${icons[type]}</div>
+        <div class="toast-content">${message}</div>
+        <button class="toast-close" onclick="this.closest('.toast').remove()">×</button>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 250);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>独立游戏中文社区 - AtlasSite</title>
+  <style>
+    :root {
+      --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.8125rem);
+      --text-sm: clamp(0.875rem, 0.825rem + 0.25vw, 0.9375rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
+      --text-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
+      --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+      --space-6: 1.5rem; --space-8: 2rem; --space-12: 3rem;
+      --content-width: 720px; --sidebar-width: 240px;
+      --radius-sm: 4px; --radius-md: 8px; --radius-full: 999px;
+
+      --bg-primary: #FFFFFF; --bg-secondary: #F5F5F5; --bg-tertiary: #EBEBEB; --bg-hover: #F9F9F9;
+      --text-primary: #000000; --text-secondary: #525252; --text-tertiary: #737373; --text-inverse: #FFFFFF;
+      --border-subtle: #E5E5E5; --border-default: #D4D4D4; --border-strong: #A3A3A3;
+      --accent-primary: #0066FF;
+
+      --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.04);
+      --shadow-sm: 0 2px 4px 0 rgba(0,0,0,0.06), 0 1px 2px 0 rgba(0,0,0,0.03);
+      --shadow-md: 0 4px 8px 0 rgba(0,0,0,0.08), 0 2px 4px 0 rgba(0,0,0,0.04);
+      --shadow-lg: 0 8px 16px 0 rgba(0,0,0,0.1), 0 4px 8px 0 rgba(0,0,0,0.06);
+
+      --focus-ring: 0 0 0 3px rgba(0,102,255,0.2);
+
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 500ms cubic-bezier(0.33, 1, 0.68, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #0A0A0A; --bg-secondary: #141414; --bg-tertiary: #1F1F1F; --bg-hover: #262626;
+        --text-primary: #FAFAFA; --text-secondary: #A3A3A3; --text-tertiary: #737373; --text-inverse: #0A0A0A;
+        --border-subtle: #262626; --border-default: #404040; --border-strong: #525252;
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-base); font-size: var(--text-base); line-height: 1.75; color: var(--text-primary); background: var(--bg-primary); }
+    h1, h2, h3 { font-weight: 600; line-height: 1.3; letter-spacing: -0.02em; }
+    h1 { font-size: var(--text-xl); } h2 { font-size: var(--text-lg); }
+    a { color: var(--text-primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; }
+    @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } }
+
+    .sidebar { position: sticky; top: 0; height: 100vh; padding: var(--space-6) var(--space-4); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: var(--space-8); background: var(--bg-primary); }
+    @media (max-width: 768px) { .sidebar { position: fixed; bottom: 0; left: 0; right: 0; top: auto; height: auto; flex-direction: row; justify-content: space-around; padding: var(--space-3); border-right: none; border-top: 1px solid var(--border-subtle); z-index: 100; } }
+
+    .logo { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-lg); font-weight: 700; }
+    .logo svg { width: 32px; height: 32px; }
+    @media (max-width: 768px) { .logo span { display: none; } }
+
+    .nav { display: flex; flex-direction: column; gap: var(--space-1); }
+    @media (max-width: 768px) { .nav { flex-direction: row; gap: 0; } }
+
+    .nav-item { padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); color: var(--text-secondary); font-size: var(--text-sm); transition: all var(--transition-fast); display: flex; align-items: center; gap: var(--space-2); }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); text-decoration: none; transform: translateX(2px); }
+    .nav-item.active { background: var(--bg-secondary); color: var(--text-primary); font-weight: 500; }
+    @media (max-width: 768px) { .nav-item { flex-direction: column; gap: var(--space-1); padding: var(--space-2); font-size: var(--text-xs); } }
+
+    .main { max-width: var(--content-width); margin: 0 auto; padding: var(--space-6) var(--space-4) calc(var(--space-12) + 60px); }
+    @media (min-width: 769px) { .main { padding-bottom: var(--space-12); } }
+
+    /* Community Header */
+    .community-header {
+      padding-bottom: var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: var(--space-8);
+    }
+
+    .community-title {
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-3);
+    }
+
+    .community-subtitle {
+      color: var(--text-secondary);
+      font-size: var(--text-base);
+      margin-bottom: var(--space-4);
+      line-height: 1.6;
+    }
+
+    .community-meta {
+      display: flex;
+      gap: var(--space-4);
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: var(--space-4);
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+    }
+
+    .community-actions {
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .btn { padding: var(--space-2) var(--space-4); background: var(--text-primary); color: var(--text-inverse); border: none; border-radius: var(--radius-full); font-family: inherit; font-size: var(--text-sm); font-weight: 500; cursor: pointer; transition: all var(--transition-fast); }
+    .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+    .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-default); }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .tab-btn { padding: var(--space-2) 0; background: none; border: none; color: var(--text-secondary); font-size: var(--text-base); font-family: inherit; cursor: pointer; border-bottom: 2px solid transparent; transition: all var(--transition-fast); }
+    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn.active { color: var(--text-primary); font-weight: 500; border-bottom-color: var(--text-primary); }
+    .tab-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+
+    /* Tools Section */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+
+    .tool-card {
+      padding: var(--space-4);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-base);
+    }
+
+    .tool-card:hover {
+      background: var(--bg-tertiary);
+      text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .tool-title {
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+
+    .tool-desc {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+
+    /* Content List */
+    .content-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .content-item {
+      padding-bottom: var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .content-item:last-child {
+      border-bottom: none;
+    }
+
+    .content-header {
+      display: flex;
+      gap: var(--space-2);
+      align-items: baseline;
+      margin-bottom: var(--space-2);
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+    }
+
+    .content-author {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .content-title {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+
+    .content-excerpt {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-3);
+    }
+
+    .content-meta {
+      display: flex;
+      gap: var(--space-4);
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+    }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="/" class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+            <path d="M36 8 C35.5 13 36 18 35.5 22 C35 25 33.5 27 30.5 28.5 C25 31 18 33 11 35"/>
+            <path d="M12.5 39 C17 38.5 20.5 40 26 43"/>
+            <path d="M29 42.5 C31 48 34 52 34.5 58"/>
+            <circle cx="36" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="11" cy="35" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="26" cy="43" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="29" cy="42.5" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="34.5" cy="58" r="1.5" fill="currentColor" stroke="none"/>
+          </g>
+        </svg>
+        <span>AtlasSite</span>
+      </a>
+      <nav class="nav">
+        <a href="/" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>首页</span>
+        </a>
+        <a href="/discover" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>发现</span>
+        </a>
+        <a href="/notifications" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span>通知</span>
+        </a>
+        <a href="/settings" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>设置</span>
+        </a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="community-header">
+        <h1 class="community-title">独立游戏中文社区</h1>
+        <p class="community-subtitle">
+          讨论独立游戏的创作、推荐与评论。关注游戏机制、叙事设计和独立开发者的作品。
+        </p>
+        <div class="community-meta">
+          <span>1,234 名成员</span>
+          <span>·</span>
+          <span>3 小时前活跃</span>
+          <span>·</span>
+          <span>开放加入</span>
+        </div>
+        <div class="community-actions">
+          <button class="btn">加入社群</button>
+          <button class="btn btn-secondary">关注动态</button>
+        </div>
+      </header>
+
+      <nav class="tabs">
+        <button class="tab-btn active">最新内容</button>
+        <button class="tab-btn">社群工具</button>
+        <button class="tab-btn">成员</button>
+        <button class="tab-btn">关于</button>
+      </nav>
+
+      <!-- Tools Preview (shown in main tab) -->
+      <section style="margin-bottom: var(--space-8);">
+        <h2 style="font-size: var(--text-lg); margin-bottom: var(--space-4);">社群工具</h2>
+        <div class="tools-grid">
+          <a href="/c/indie-games-cn/announcements" class="tool-card">
+            <h3 class="tool-title">公告与新人指引</h3>
+            <p class="tool-desc">社群规则、加入方式和常见问题</p>
+          </a>
+          <a href="/c/indie-games-cn/collections" class="tool-card">
+            <h3 class="tool-title">讨论合集</h3>
+            <p class="tool-desc">3 个合集 · 最近更新 2 天前</p>
+          </a>
+          <a href="/c/indie-games-cn/showcase" class="tool-card">
+            <h3 class="tool-title">作品展柜</h3>
+            <p class="tool-desc">12 件作品 · 最近提交昨天</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- Content Feed -->
+      <section>
+        <h2 class="sr-only">社群内容</h2>
+        <div class="content-list">
+          <article class="content-item">
+            <div class="content-header">
+              <a href="/u/li_hua" class="content-author">李华</a>
+              <span>·</span>
+              <span>3 小时前</span>
+            </div>
+            <h3 class="content-title">
+              <a href="/post/1">最近在玩一款像素风格的解谜游戏，关卡设计真的很精妙</a>
+            </h3>
+            <p class="content-excerpt">
+              推荐大家试试《Baba Is You》,它的核心机制是通过移动方块来改变游戏规则本身...
+            </p>
+            <div class="content-meta">
+              <span>12 回复</span>
+              <span>24 收藏</span>
+            </div>
+          </article>
+
+          <article class="content-item">
+            <div class="content-header">
+              <a href="/u/game_dev" class="content-author">游戏开发者A</a>
+              <span>·</span>
+              <span>昨天 18:30</span>
+            </div>
+            <h3 class="content-title">
+              <a href="/post/2">分享一下我的独立游戏开发心路历程</a>
+            </h3>
+            <p class="content-excerpt">
+              从构思到完成第一个可玩的 demo,花了整整 6 个月。中间遇到了很多技术难题和设计上的抉择...
+            </p>
+            <div class="content-meta">
+              <span>28 回复</span>
+              <span>67 收藏</span>
+            </div>
+          </article>
+
+          <article class="content-item">
+            <div class="content-header">
+              <a href="/u/player_x" class="content-author">玩家X</a>
+              <span>·</span>
+              <span>2 天前</span>
+            </div>
+            <h3 class="content-title">
+              <a href="/post/3">2025 年值得期待的独立游戏清单</a>
+            </h3>
+            <p class="content-excerpt">
+              整理了一份今年即将发布的独立游戏,包括平台、发售日期和核心玩法介绍...
+            </p>
+            <div class="content-meta">
+              <span>45 回复</span>
+              <span>156 收藏</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <div style="display: flex; justify-content: center; margin-top: var(--space-8);">
+        <button class="btn btn-secondary">加载更多</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

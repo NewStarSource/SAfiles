@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>发现社群 - AtlasSite</title>
+  <style>
+    /* ========== Shared styles from main file ========== */
+    :root {
+      --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.8125rem);
+      --text-sm: clamp(0.875rem, 0.825rem + 0.25vw, 0.9375rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
+      --text-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
+      --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-12: 3rem;
+      --content-width: 720px;
+      --sidebar-width: 240px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-full: 999px;
+
+      --bg-primary: #FFFFFF;
+      --bg-secondary: #F5F5F5;
+      --bg-tertiary: #EBEBEB;
+      --bg-hover: #F9F9F9;
+      --text-primary: #000000;
+      --text-secondary: #525252;
+      --text-tertiary: #737373;
+      --text-inverse: #FFFFFF;
+      --border-subtle: #E5E5E5;
+      --border-default: #D4D4D4;
+      --border-strong: #A3A3A3;
+      --accent-primary: #0066FF;
+
+      --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.04);
+      --shadow-sm: 0 2px 4px 0 rgba(0,0,0,0.06), 0 1px 2px 0 rgba(0,0,0,0.03);
+      --shadow-md: 0 4px 8px 0 rgba(0,0,0,0.08), 0 2px 4px 0 rgba(0,0,0,0.04);
+      --shadow-lg: 0 8px 16px 0 rgba(0,0,0,0.1), 0 4px 8px 0 rgba(0,0,0,0.06);
+
+      --focus-ring: 0 0 0 3px rgba(0,102,255,0.2);
+
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 500ms cubic-bezier(0.33, 1, 0.68, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #0A0A0A;
+        --bg-secondary: #141414;
+        --bg-tertiary: #1F1F1F;
+        --bg-hover: #262626;
+        --text-primary: #FAFAFA;
+        --text-secondary: #A3A3A3;
+        --text-tertiary: #737373;
+        --text-inverse: #0A0A0A;
+        --border-subtle: #262626;
+        --border-default: #404040;
+        --border-strong: #525252;
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-base); font-size: var(--text-base); line-height: 1.75; color: var(--text-primary); background: var(--bg-primary); }
+    h1, h2, h3 { font-weight: 600; line-height: 1.3; letter-spacing: -0.02em; }
+    h1 { font-size: var(--text-xl); }
+    h2 { font-size: var(--text-lg); }
+    a { color: var(--text-primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; }
+    @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } }
+
+    .sidebar { position: sticky; top: 0; height: 100vh; padding: var(--space-6) var(--space-4); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: var(--space-8); background: var(--bg-primary); }
+    @media (max-width: 768px) { .sidebar { position: fixed; bottom: 0; left: 0; right: 0; top: auto; height: auto; flex-direction: row; justify-content: space-around; padding: var(--space-3); border-right: none; border-top: 1px solid var(--border-subtle); z-index: 100; } }
+
+    .logo { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-lg); font-weight: 700; letter-spacing: -0.03em; }
+    .logo svg { width: 32px; height: 32px; }
+    @media (max-width: 768px) { .logo span { display: none; } }
+
+    .nav { display: flex; flex-direction: column; gap: var(--space-1); }
+    @media (max-width: 768px) { .nav { flex-direction: row; gap: 0; } }
+
+    .nav-item { padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); color: var(--text-secondary); font-size: var(--text-sm); transition: all var(--transition-fast); display: flex; align-items: center; gap: var(--space-2); }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); text-decoration: none; transform: translateX(2px); }
+    .nav-item.active { background: var(--bg-secondary); color: var(--text-primary); font-weight: 500; }
+    .nav-item:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+    @media (max-width: 768px) { .nav-item { flex-direction: column; gap: var(--space-1); padding: var(--space-2); font-size: var(--text-xs); } }
+
+    .main { max-width: var(--content-width); margin: 0 auto; padding: var(--space-6) var(--space-4) calc(var(--space-12) + 60px); }
+    @media (min-width: 769px) { .main { padding-bottom: var(--space-12); } }
+
+    /* ========== Discover Page Specific ========== */
+    .page-header {
+      margin-bottom: var(--space-8);
+    }
+
+    .page-title {
+      margin-bottom: var(--space-3);
+    }
+
+    .search-box {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: var(--text-base);
+      color: var(--text-primary);
+      transition: all var(--transition-base);
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: var(--focus-ring);
+      background: var(--bg-primary);
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-6);
+      padding: var(--space-3) 0;
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+
+    .breadcrumb a {
+      color: var(--text-secondary);
+    }
+
+    .breadcrumb a:hover {
+      color: var(--text-primary);
+    }
+
+    .breadcrumb-sep {
+      color: var(--text-tertiary);
+    }
+
+    .filters {
+      display: flex;
+      gap: var(--space-2);
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: var(--space-1) var(--space-3);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .filter-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-btn.active {
+      background: var(--text-primary);
+      color: var(--text-inverse);
+      border-color: var(--text-primary);
+      box-shadow: var(--shadow-xs);
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    .category-section {
+      padding-bottom: var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .category-section:last-child {
+      border-bottom: none;
+    }
+
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: var(--space-4);
+    }
+
+    .category-title {
+      font-size: var(--text-lg);
+      font-weight: 600;
+    }
+
+    .category-count {
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+    }
+
+    .subcategory-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--space-4);
+    }
+
+    @media (max-width: 768px) {
+      .subcategory-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .subcategory-item {
+      padding: var(--space-4);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-base);
+    }
+
+    .subcategory-item:hover {
+      background: var(--bg-tertiary);
+      text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .subcategory-name {
+      font-weight: 500;
+      margin-bottom: var(--space-1);
+    }
+
+    .subcategory-meta {
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+    }
+
+    .community-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .community-card {
+      padding: var(--space-4);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-base);
+      background: var(--bg-primary);
+    }
+
+    .community-card:hover {
+      border-color: var(--border-default);
+      text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .community-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: var(--space-2);
+    }
+
+    .community-name {
+      font-size: var(--text-lg);
+      font-weight: 600;
+    }
+
+    .community-badge {
+      padding: var(--space-1) var(--space-2);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+    }
+
+    .community-desc {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-3);
+      line-height: 1.6;
+    }
+
+    .community-meta {
+      display: flex;
+      gap: var(--space-4);
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+    }
+
+    .btn { padding: var(--space-2) var(--space-4); background: var(--text-primary); color: var(--text-inverse); border: none; border-radius: var(--radius-full); font-family: inherit; font-size: var(--text-sm); font-weight: 500; cursor: pointer; transition: all var(--transition-fast); }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+    .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-default); }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .category-section {
+      animation: fadeIn var(--transition-smooth) ease-out;
+    }
+
+    .category-section:nth-child(1) { animation-delay: 50ms; }
+    .category-section:nth-child(2) { animation-delay: 100ms; }
+    .category-section:nth-child(3) { animation-delay: 150ms; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="/" class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+            <path d="M36 8 C35.5 13 36 18 35.5 22 C35 25 33.5 27 30.5 28.5 C25 31 18 33 11 35"/>
+            <path d="M12.5 39 C17 38.5 20.5 40 26 43"/>
+            <path d="M29 42.5 C31 48 34 52 34.5 58"/>
+            <circle cx="36" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="11" cy="35" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="26" cy="43" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="29" cy="42.5" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="34.5" cy="58" r="1.5" fill="currentColor" stroke="none"/>
+          </g>
+        </svg>
+        <span>AtlasSite</span>
+      </a>
+      <nav class="nav">
+        <a href="/" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>首页</span>
+        </a>
+        <a href="/discover" class="nav-item active">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>发现</span>
+        </a>
+        <a href="/notifications" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span>通知</span>
+        </a>
+        <a href="/settings" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>设置</span>
+        </a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <h1 class="page-title">发现社群</h1>
+        <input type="search" class="search-box" placeholder="搜索社群或主题…" aria-label="搜索社群">
+      </div>
+
+      <nav class="breadcrumb" aria-label="面包屑导航">
+        <a href="/discover">全部领域</a>
+        <span class="breadcrumb-sep" aria-hidden="true">›</span>
+        <span aria-current="page">游戏与互动</span>
+      </nav>
+
+      <div class="filters">
+        <button class="filter-btn active">全部</button>
+        <button class="filter-btn">活跃</button>
+        <button class="filter-btn">新建</button>
+        <button class="filter-btn">开放加入</button>
+        <button class="filter-btn">中文</button>
+      </div>
+
+      <div class="category-grid">
+        <!-- Category: 电子游戏 -->
+        <section class="category-section">
+          <header class="category-header">
+            <h2 class="category-title">
+              <a href="/discover/games/video-games">电子游戏</a>
+            </h2>
+            <span class="category-count">127 个社群</span>
+          </header>
+          <div class="subcategory-list">
+            <a href="/discover/games/rpg" class="subcategory-item">
+              <div class="subcategory-name">角色扮演</div>
+              <div class="subcategory-meta">32 个社群</div>
+            </a>
+            <a href="/discover/games/competitive" class="subcategory-item">
+              <div class="subcategory-name">竞技对战</div>
+              <div class="subcategory-meta">28 个社群</div>
+            </a>
+            <a href="/discover/games/strategy" class="subcategory-item">
+              <div class="subcategory-name">策略与模拟</div>
+              <div class="subcategory-meta">19 个社群</div>
+            </a>
+            <a href="/discover/games/indie" class="subcategory-item">
+              <div class="subcategory-name">独立游戏</div>
+              <div class="subcategory-meta">48 个社群</div>
+            </a>
+          </div>
+        </section>
+
+        <!-- Category: 桌面游戏 -->
+        <section class="category-section">
+          <header class="category-header">
+            <h2 class="category-title">
+              <a href="/discover/games/tabletop">桌面游戏</a>
+            </h2>
+            <span class="category-count">43 个社群</span>
+          </header>
+          <div class="subcategory-list">
+            <a href="/discover/games/board-games" class="subcategory-item">
+              <div class="subcategory-name">桌游</div>
+              <div class="subcategory-meta">24 个社群</div>
+            </a>
+            <a href="/discover/games/tcg" class="subcategory-item">
+              <div class="subcategory-name">集换式卡牌</div>
+              <div class="subcategory-meta">11 个社群</div>
+            </a>
+            <a href="/discover/games/trpg" class="subcategory-item">
+              <div class="subcategory-name">跑团与桌上 RPG</div>
+              <div class="subcategory-meta">8 个社群</div>
+            </a>
+          </div>
+        </section>
+
+        <!-- Community List -->
+        <section>
+          <header class="category-header">
+            <h2 class="category-title">独立游戏社群</h2>
+          </header>
+          <div class="community-list">
+            <a href="/c/indie-games-cn" class="community-card">
+              <div class="community-header">
+                <h3 class="community-name">独立游戏中文社区</h3>
+                <span class="community-badge">开放</span>
+              </div>
+              <p class="community-desc">
+                讨论独立游戏的创作、推荐与评论。关注游戏机制、叙事设计和独立开发者的作品。
+              </p>
+              <div class="community-meta">
+                <span>1,234 名成员</span>
+                <span>·</span>
+                <span>3 小时前活跃</span>
+              </div>
+            </a>
+
+            <a href="/c/puzzle-lovers" class="community-card">
+              <div class="community-header">
+                <h3 class="community-name">解谜游戏爱好者</h3>
+                <span class="community-badge">开放</span>
+              </div>
+              <p class="community-desc">
+                从《见证者》到《Baba Is You》，分享和讨论各类解谜游戏。欢迎剧透警告。
+              </p>
+              <div class="community-meta">
+                <span>567 名成员</span>
+                <span>·</span>
+                <span>昨天活跃</span>
+              </div>
+            </a>
+
+            <a href="/c/metroidvania" class="community-card">
+              <div class="community-header">
+                <h3 class="community-name">银河城爱好者</h3>
+                <span class="community-badge">开放</span>
+              </div>
+              <p class="community-desc">
+                Metroidvania 类型游戏的讨论与推荐。关注地图设计、能力解锁与探索体验。
+              </p>
+              <div class="community-meta">
+                <span>892 名成员</span>
+                <span>·</span>
+                <span>5 小时前活跃</span>
+              </div>
+            </a>
+          </div>
+        </section>
+      </div>
+
+      <div style="display: flex; justify-content: center; margin-top: var(--space-8);">
+        <button class="btn btn-secondary">加载更多社群</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

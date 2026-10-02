@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>发布内容 - AtlasSite</title>
+  <style>
+    :root {
+      --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: "SF Mono", Monaco, "Cascadia Code", "Consolas", monospace;
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.8125rem);
+      --text-sm: clamp(0.875rem, 0.825rem + 0.25vw, 0.9375rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
+      --text-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+      --space-6: 1.5rem; --space-8: 2rem; --space-12: 3rem;
+      --content-width: 720px; --sidebar-width: 240px;
+      --radius-sm: 4px; --radius-md: 8px; --radius-full: 999px;
+
+      --bg-primary: #FFFFFF; --bg-secondary: #F5F5F5; --bg-tertiary: #EBEBEB; --bg-hover: #F9F9F9;
+      --text-primary: #000000; --text-secondary: #525252; --text-tertiary: #737373; --text-inverse: #FFFFFF;
+      --border-subtle: #E5E5E5; --border-default: #D4D4D4; --border-strong: #A3A3A3;
+      --accent-primary: #0066FF;
+      --state-warning: #EA580C;
+
+      --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.04);
+      --shadow-sm: 0 2px 4px 0 rgba(0,0,0,0.06), 0 1px 2px 0 rgba(0,0,0,0.03);
+      --shadow-md: 0 4px 8px 0 rgba(0,0,0,0.08), 0 2px 4px 0 rgba(0,0,0,0.04);
+      --shadow-lg: 0 8px 16px 0 rgba(0,0,0,0.1), 0 4px 8px 0 rgba(0,0,0,0.06);
+
+      --focus-ring: 0 0 0 3px rgba(0,102,255,0.2);
+
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 500ms cubic-bezier(0.33, 1, 0.68, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #0A0A0A; --bg-secondary: #141414; --bg-tertiary: #1F1F1F; --bg-hover: #262626;
+        --text-primary: #FAFAFA; --text-secondary: #A3A3A3; --text-tertiary: #737373; --text-inverse: #0A0A0A;
+        --border-subtle: #262626; --border-default: #404040; --border-strong: #525252;
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-base); font-size: var(--text-base); line-height: 1.75; color: var(--text-primary); background: var(--bg-primary); }
+    h1, h2 { font-weight: 600; line-height: 1.3; letter-spacing: -0.02em; }
+    h1 { font-size: var(--text-lg); }
+    a { color: var(--text-primary); text-decoration: none; }
+
+    .layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; }
+    @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } }
+
+    .sidebar { position: sticky; top: 0; height: 100vh; padding: var(--space-6) var(--space-4); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: var(--space-8); background: var(--bg-primary); }
+    @media (max-width: 768px) { .sidebar { position: fixed; bottom: 0; left: 0; right: 0; top: auto; height: auto; flex-direction: row; justify-content: space-around; padding: var(--space-3); border-right: none; border-top: 1px solid var(--border-subtle); z-index: 100; } }
+
+    .logo { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-lg); font-weight: 700; }
+    .logo svg { width: 32px; height: 32px; }
+    @media (max-width: 768px) { .logo span { display: none; } }
+
+    .nav { display: flex; flex-direction: column; gap: var(--space-1); }
+    @media (max-width: 768px) { .nav { flex-direction: row; gap: 0; } }
+
+    .nav-item { padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); color: var(--text-secondary); font-size: var(--text-sm); transition: all var(--transition-fast); display: flex; align-items: center; gap: var(--space-2); }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); text-decoration: none; transform: translateX(2px); }
+    @media (max-width: 768px) { .nav-item { flex-direction: column; gap: var(--space-1); padding: var(--space-2); font-size: var(--text-xs); } }
+
+    .main { max-width: var(--content-width); margin: 0 auto; padding: var(--space-6) var(--space-4) calc(var(--space-12) + 60px); }
+    @media (min-width: 769px) { .main { padding-bottom: var(--space-12); } }
+
+    /* Editor Layout */
+    .editor-container {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .editor-modes {
+      display: flex;
+      gap: var(--space-2);
+      padding: var(--space-2);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: var(--space-2);
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .mode-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .mode-btn.active {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-weight: 500;
+      box-shadow: var(--shadow-xs);
+    }
+
+    @media (min-width: 1024px) {
+      .editor-container.side-by-side {
+        grid-template-columns: 1fr 1fr;
+      }
+      .editor-container.side-by-side .editor-modes {
+        display: none;
+      }
+    }
+
+    .editor-panel {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .panel-hidden {
+      display: none;
+    }
+
+    @media (min-width: 1024px) {
+      .editor-container.side-by-side .panel-hidden {
+        display: flex;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .form-label {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: var(--space-3);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: var(--text-base);
+      color: var(--text-primary);
+      transition: all var(--transition-fast);
+    }
+
+    .form-textarea {
+      min-height: 320px;
+      resize: vertical;
+      font-family: var(--font-mono);
+      line-height: 1.6;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: var(--focus-ring);
+    }
+
+    .form-input:hover, .form-textarea:hover, .form-select:hover {
+      border-color: var(--border-strong);
+    }
+
+    .form-help {
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+    }
+
+    /* Preview */
+    .preview-content {
+      padding: var(--space-4);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      min-height: 320px;
+    }
+
+    .preview-content h1 { font-size: var(--text-lg); margin-bottom: var(--space-3); }
+    .preview-content h2 { font-size: var(--text-base); margin-top: var(--space-4); margin-bottom: var(--space-2); }
+    .preview-content p { margin-bottom: var(--space-3); color: var(--text-secondary); }
+    .preview-content code { padding: 0.125rem var(--space-2); background: var(--bg-secondary); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.9em; }
+    .preview-content pre { padding: var(--space-3); background: var(--bg-secondary); border-radius: var(--radius-sm); overflow-x: auto; }
+    .preview-content pre code { padding: 0; background: none; }
+
+    /* Metadata */
+    .metadata-grid {
+      display: grid;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+    }
+
+    .tag-input-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      padding: var(--space-2);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+    }
+
+    .tag-chip {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: var(--space-1) var(--space-3);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+    }
+
+    .tag-remove {
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+
+    /* Image Upload */
+    .image-upload {
+      padding: var(--space-6);
+      background: var(--bg-secondary);
+      border: 2px dashed var(--border-default);
+      border-radius: var(--radius-md);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+
+    .image-upload:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-tertiary);
+      transform: translateY(-2px);
+    }
+
+    .image-upload input[type="file"] {
+      display: none;
+    }
+
+    .image-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: var(--space-3);
+      margin-top: var(--space-3);
+    }
+
+    .image-preview-item {
+      position: relative;
+      aspect-ratio: 1;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .image-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .image-remove {
+      position: absolute;
+      top: var(--space-1);
+      right: var(--space-1);
+      padding: var(--space-1);
+      background: rgba(0,0,0,0.7);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    /* Actions */
+    .editor-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .btn {
+      padding: var(--space-2) var(--space-4);
+      background: var(--text-primary);
+      color: var(--text-inverse);
+      border: none;
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-default);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--border-strong);
+    }
+
+    .unsaved-warning {
+      display: none;
+      padding: var(--space-2) var(--space-3);
+      background: var(--state-warning);
+      color: white;
+      border-radius: var(--radius-sm);
+      font-size: var(--text-sm);
+    }
+
+    .unsaved-warning.show {
+      display: block;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: start;
+      gap: var(--space-2);
+    }
+
+    .radio-option input[type="radio"] {
+      margin-top: 0.25rem;
+    }
+
+    .radio-label {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .radio-desc {
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="/" class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+            <path d="M36 8 C35.5 13 36 18 35.5 22 C35 25 33.5 27 30.5 28.5 C25 31 18 33 11 35"/>
+            <path d="M12.5 39 C17 38.5 20.5 40 26 43"/>
+            <path d="M29 42.5 C31 48 34 52 34.5 58"/>
+            <circle cx="36" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="11" cy="35" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="26" cy="43" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="29" cy="42.5" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="34.5" cy="58" r="1.5" fill="currentColor" stroke="none"/>
+          </g>
+        </svg>
+        <span>AtlasSite</span>
+      </a>
+      <nav class="nav">
+        <a href="/" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>首页</span>
+        </a>
+        <a href="/discover" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>发现</span>
+        </a>
+        <a href="/notifications" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span>通知</span>
+        </a>
+        <a href="/settings" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>设置</span>
+        </a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <h1 style="margin-bottom: var(--space-6);">发布内容</h1>
+
+      <form id="editor-form">
+        <!-- Editor Modes (Mobile/Tablet) -->
+        <div class="editor-modes">
+          <button type="button" class="mode-btn active" data-mode="edit">编辑</button>
+          <button type="button" class="mode-btn" data-mode="preview">预览</button>
+        </div>
+
+        <!-- Editor Container -->
+        <div class="editor-container" id="editor-container">
+          <!-- Edit Panel -->
+          <div class="editor-panel" id="edit-panel">
+            <div class="form-group">
+              <label for="title" class="form-label">标题</label>
+              <input type="text" id="title" class="form-input" placeholder="给你的内容起个标题">
+            </div>
+
+            <div class="form-group">
+              <label for="content" class="form-label">正文</label>
+              <textarea id="content" class="form-textarea" placeholder="支持 Markdown 格式...
+
+# 一级标题
+## 二级标题
+
+**粗体** *斜体* `代码`
+
+- 列表项
+- 列表项
+
+[链接](https://example.com)"></textarea>
+              <span class="form-help">支持 Markdown 格式。预览会在输入停止 300 毫秒后更新。</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">上传图片</label>
+              <label for="image-upload" class="image-upload">
+                <input type="file" id="image-upload" accept="image/*" multiple>
+                <div>点击上传图片</div>
+                <div style="font-size: var(--text-sm); color: var(--text-tertiary); margin-top: var(--space-2);">
+                  支持 JPG、PNG、GIF，单张最大 5MB
+                </div>
+              </label>
+              <div id="image-preview-grid" class="image-preview-grid"></div>
+            </div>
+          </div>
+
+          <!-- Preview Panel -->
+          <div class="editor-panel panel-hidden" id="preview-panel">
+            <div class="form-group">
+              <label class="form-label">预览</label>
+              <div id="preview-content" class="preview-content">
+                <p style="color: var(--text-tertiary);">预览会在此显示...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metadata -->
+        <div class="metadata-grid">
+          <div class="form-group">
+            <label for="content-type" class="form-label">内容类型</label>
+            <select id="content-type" class="form-select">
+              <option value="">不设置类型</option>
+              <option value="discussion">讨论</option>
+              <option value="creation">创作</option>
+              <option value="observation">观察</option>
+              <option value="recruitment">招募</option>
+              <option value="activity">活动</option>
+              <option value="share">个人分享</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="community" class="form-label">关联社群</label>
+            <input type="text" id="community" class="form-input" placeholder="搜索社群...">
+            <span class="form-help">可选，也可以不关联任何社群</span>
+          </div>
+
+          <div class="form-group">
+            <label for="tags" class="form-label">主题标签</label>
+            <div class="tag-input-container" id="tag-container">
+              <input type="text" id="tags" placeholder="添加标签..." style="border: none; outline: none; flex: 1; background: transparent; min-width: 120px;">
+            </div>
+            <span class="form-help">输入后按回车添加，最多 5 个标签</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">内容许可</label>
+            <div class="radio-group">
+              <label class="radio-option">
+                <input type="radio" name="license" value="cc-by-sa" checked>
+                <span class="radio-label">
+                  <span>CC BY-SA 4.0（默认）</span>
+                  <span class="radio-desc">允许他人转载、改编，需署名并以相同方式共享</span>
+                </span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="license" value="cc-by">
+                <span class="radio-label">
+                  <span>CC BY 4.0</span>
+                  <span class="radio-desc">允许他人转载、改编，仅需署名</span>
+                </span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="license" value="all-rights-reserved">
+                <span class="radio-label">
+                  <span>保留全部权利</span>
+                  <span class="radio-desc">仅授权站内展示，不允许站外转载或改编</span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="editor-actions">
+          <div class="unsaved-warning" id="unsaved-warning">
+            内容尚未保存
+          </div>
+          <div style="display: flex; gap: var(--space-3);">
+            <button type="button" class="btn btn-secondary">保存草稿</button>
+            <button type="submit" class="btn">发布</button>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script>
+    // Editor mode switching
+    const modeBtns = document.querySelectorAll('.mode-btn');
+    const editPanel = document.getElementById('edit-panel');
+    const previewPanel = document.getElementById('preview-panel');
+    const editorContainer = document.getElementById('editor-container');
+
+    modeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.mode;
+        modeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (mode === 'edit') {
+          editPanel.classList.remove('panel-hidden');
+          previewPanel.classList.add('panel-hidden');
+        } else {
+          editPanel.classList.add('panel-hidden');
+          previewPanel.classList.remove('panel-hidden');
+          updatePreview();
+        }
+      });
+    });
+
+    // Check for desktop side-by-side
+    function checkLayout() {
+      if (window.innerWidth >= 1024) {
+        editorContainer.classList.add('side-by-side');
+        editPanel.classList.remove('panel-hidden');
+        previewPanel.classList.remove('panel-hidden');
+      } else {
+        editorContainer.classList.remove('side-by-side');
+      }
+    }
+    checkLayout();
+    window.addEventListener('resize', checkLayout);
+
+    // Preview update
+    let previewTimeout;
+    const contentTextarea = document.getElementById('content');
+    const titleInput = document.getElementById('title');
+    const previewContent = document.getElementById('preview-content');
+
+    function updatePreview() {
+      const title = titleInput.value;
+      const content = contentTextarea.value;
+
+      let html = '';
+      if (title) html += `<h1>${escapeHtml(title)}</h1>`;
+      if (content) {
+        // Simple markdown parsing (production would use a proper parser)
+        html += parseMarkdown(content);
+      }
+
+      previewContent.innerHTML = html || '<p style="color: var(--text-tertiary);">预览会在此显示...</p>';
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function parseMarkdown(text) {
+      return text
+        .split('\n\n')
+        .map(para => {
+          if (para.startsWith('# ')) return `<h1>${escapeHtml(para.slice(2))}</h1>`;
+          if (para.startsWith('## ')) return `<h2>${escapeHtml(para.slice(3))}</h2>`;
+          if (para.startsWith('- ')) return `<ul>${para.split('\n').map(li => `<li>${escapeHtml(li.slice(2))}</li>`).join('')}</ul>`;
+          return `<p>${escapeHtml(para)}</p>`;
+        })
+        .join('');
+    }
+
+    contentTextarea.addEventListener('input', () => {
+      clearTimeout(previewTimeout);
+      previewTimeout = setTimeout(updatePreview, 300);
+      document.getElementById('unsaved-warning').classList.add('show');
+    });
+
+    titleInput.addEventListener('input', () => {
+      updatePreview();
+      document.getElementById('unsaved-warning').classList.add('show');
+    });
+
+    // Tag input
+    const tagInput = document.getElementById('tags');
+    const tagContainer = document.getElementById('tag-container');
+    const tags = [];
+
+    tagInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && tagInput.value.trim()) {
+        e.preventDefault();
+        if (tags.length < 5) {
+          const tag = tagInput.value.trim();
+          tags.push(tag);
+          addTagChip(tag);
+          tagInput.value = '';
+        }
+      }
+    });
+
+    function addTagChip(tag) {
+      const chip = document.createElement('div');
+      chip.className = 'tag-chip';
+      chip.innerHTML = `
+        <span>${escapeHtml(tag)}</span>
+        <button type="button" class="tag-remove" aria-label="移除标签">×</button>
+      `;
+      chip.querySelector('.tag-remove').addEventListener('click', () => {
+        const index = tags.indexOf(tag);
+        if (index > -1) tags.splice(index, 1);
+        chip.remove();
+      });
+      tagContainer.insertBefore(chip, tagInput);
+    }
+
+    // Image upload preview
+    const imageUpload = document.getElementById('image-upload');
+    const imagePreviewGrid = document.getElementById('image-preview-grid');
+
+    imageUpload.addEventListener('change', (e) => {
+      Array.from(e.target.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const item = document.createElement('div');
+          item.className = 'image-preview-item';
+          item.innerHTML = `
+            <img src="${event.target.result}" alt="预览">
+            <button type="button" class="image-remove" aria-label="删除图片">×</button>
+          `;
+          item.querySelector('.image-remove').addEventListener('click', () => item.remove());
+          imagePreviewGrid.appendChild(item);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    // Form submission
+    document.getElementById('editor-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('发布功能需要后端支持。这是一个前端原型。');
+    });
+
+    // Warn on navigation
+    window.addEventListener('beforeunload', (e) => {
+      if (document.getElementById('unsaved-warning').classList.contains('show')) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+  </script>
+</body>
+</html>
